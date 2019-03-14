@@ -1,0 +1,56 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion build_versions.target_sdk
+    defaultConfig {
+        applicationId "com.aleengo.wassup"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode 1
+        versionName "0.1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = javav.v8
+        targetCompatibility = javav.v8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.toolbox.commons
+    implementation deps.toolbox.android
+
+    implementation deps.support.annotations
+    implementation deps.support.app_compat
+    implementation deps.support.design
+    implementation deps.support.v4
+    implementation deps.constraint_layout
+
+    // lombok
+    compileOnly deps.lombok
+    annotationProcessor deps.lombok
+
+    // butterknife
+    implementation deps.butterknife.runtime
+    annotationProcessor deps.butterknife.compiler
+
+    // leak canary
+    debugImplementation deps.leakcanary.runtime
+    releaseImplementation deps.leakcanary.android_noop
+
+    testImplementation deps.junit
+
+    androidTestImplementation deps.android_test_runner
+
+    androidTestImplementation deps.espresso.core
+}
