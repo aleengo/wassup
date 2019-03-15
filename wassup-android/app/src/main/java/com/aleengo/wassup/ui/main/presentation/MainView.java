@@ -10,6 +10,8 @@ import com.aleengo.peach.toolbox.utils.Util;
 import com.aleengo.wassup.R;
 import com.aleengo.wassup.ui.main.views.MainActivity;
 
+import javax.inject.Inject;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
@@ -18,36 +20,41 @@ import butterknife.BindView;
  * Created by CK_ALEENGO on 14/03/2019.
  * Copyright (c) 2019. All rights reserved.
  */
-public class MainView extends FrameLayout {
+public class MainView extends FrameLayout implements MainContract.View {
 
     @BindView(R.id.home_toolbar)
     Toolbar toolbar;
 
-    private AppCompatActivity activity;
+    private MainActivity activity;
     private Menu menu;
 
-    public MainView(AppCompatActivity activity) {
+    @Inject
+    public MainView(MainActivity activity) {
         super(activity);
         this.activity = activity;
         inflate(getContext(), R.layout.activity_main, this);
     }
 
+    @Override
     public void init() {
         activity.setSupportActionBar(toolbar);
     }
 
+    @Override
     public void clear() {
         menu = null;
         activity = null;
     }
 
+    @Override
     public boolean inflateMenu(Menu menu) {
         this.menu = menu;
         activity.getMenuInflater().inflate(R.menu.activity_main_menu, menu);
         return true;
     }
 
-    public boolean optionsItemSelected(MenuItem item) {
+    @Override
+    public boolean menuItemSelected(MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
             case R.id.menu_action:

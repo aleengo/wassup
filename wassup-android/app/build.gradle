@@ -44,6 +44,10 @@ dependencies {
     implementation deps.butterknife.runtime
     annotationProcessor deps.butterknife.compiler
 
+    // dagger
+    implementation deps.dagger2.runtime
+    annotationProcessor deps.dagger2.compiler
+
     // leak canary
     debugImplementation deps.leakcanary.runtime
     releaseImplementation deps.leakcanary.android_noop

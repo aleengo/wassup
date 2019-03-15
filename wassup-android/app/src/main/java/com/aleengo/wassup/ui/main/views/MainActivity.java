@@ -1,20 +1,31 @@
 package com.aleengo.wassup.ui.main.views;
 
-import androidx.appcompat.app.AppCompatActivity;
+import lombok.Getter;
+import lombok.Setter;
+
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.aleengo.peach.toolbox.commons.util.Utils;
 import com.aleengo.peach.toolbox.ui.BaseActivity;
-import com.aleengo.peach.toolbox.utils.Util;
-import com.aleengo.wassup.R;
+import com.aleengo.wassup.application.WassupApplication;
+import com.aleengo.wassup.ui.main.dagger.MainActivityComponent;
+import com.aleengo.wassup.ui.main.dagger.MainActivityModule;
+import com.aleengo.wassup.ui.main.presentation.MainPresenter;
 import com.aleengo.wassup.ui.main.presentation.MainView;
+
+import javax.inject.Inject;
 
 public class MainActivity extends BaseActivity {
 
-    private MainView mMvpView;
+    @Inject
+    MainView mMvpView;
+    @Inject
+    MainPresenter presenter;
+
+    @Getter
+    private MainActivityComponent daggerComponent;
 
     @Override
     public String logTag() {
@@ -23,13 +34,17 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public View getLayoutView() {
-        mMvpView = new MainView(this);
         return mMvpView;
     }
 
     @Override
     public void daggerConfiguration() {
-        // no dagger config right now
+        daggerComponent = WassupApplication.getApplication(MainActivity.this)
+                .appComponent()
+                .MainActivityComponentBuilder()
+                .mainActivityModule(new MainActivityModule(this))
+                .build();
+        daggerComponent.inject(this);
     }
 
     @Override
@@ -39,15 +54,16 @@ public class MainActivity extends BaseActivity {
         if (savedInstanceState == null) {
         }
         mMvpView.init();
+        presenter.attach(mMvpView);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        presenter.clear();
         mMvpView.clear();
-        mMvpView = null;
+        daggerComponent = null;
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,6 +72,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return mMvpView.optionsItemSelected(item);
+        return mMvpView.menuItemSelected(item);
     }
 }

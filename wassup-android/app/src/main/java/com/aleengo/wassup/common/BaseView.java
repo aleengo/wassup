@@ -5,4 +5,6 @@ package com.aleengo.wassup.common;
  * Copyright (c) 2019. All rights reserved.
  */
 public interface BaseView {
+    void clear();
+    void init();
 }
