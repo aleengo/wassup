@@ -1,5 +1,6 @@
 package com.aleengo.wassup.application;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
@@ -16,11 +17,10 @@ import com.squareup.leakcanary.RefWatcher;
  */
 public class WassupApplication extends Application {
 
-    private RefWatcher refWatcher;
     private AppComponent appComponent;
 
-    public static WassupApplication getApplication(Context context) {
-        return (WassupApplication) context.getApplicationContext();
+    public static WassupApplication getApplication(Activity context) {
+        return (WassupApplication) context.getApplication();
     }
 
     @Override
@@ -30,26 +30,32 @@ public class WassupApplication extends Application {
         // enabled logging
         PeachConfig.setDebug(true);
 
-        // config LeakCanary
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-
-        this.refWatcher = LeakCanary.install(this);
-
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .build();
+
+        if (PeachConfig.isDebug()) {
+           installLeakCanary();
+        }
     }
 
     public AppComponent appComponent() {
         return this.appComponent;
     }
 
-    public static RefWatcher getWatcher(Context context) {
-        return getApplication(context).refWatcher;
+    public static RefWatcher getRefWatcher() {
+        return LeakCanary.installedRefWatcher();
+    }
+
+    private void installLeakCanary() {
+        // config LeakCanary
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.refWatcher(this).buildAndInstall();
+        getRefWatcher().watch(appComponent());
     }
 
 }

@@ -1,7 +1,5 @@
 package com.aleengo.wassup.ui.main.presentation;
 
-import android.app.Activity;
-import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -10,9 +8,10 @@ import com.aleengo.peach.toolbox.utils.Util;
 import com.aleengo.wassup.R;
 import com.aleengo.wassup.ui.main.views.MainActivity;
 
+import java.lang.ref.WeakReference;
+
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 
@@ -25,31 +24,34 @@ public class MainView extends FrameLayout implements MainContract.View {
     @BindView(R.id.home_toolbar)
     Toolbar toolbar;
 
-    private MainActivity activity;
-    private Menu menu;
+    private WeakReference<MainActivity> activityWeakRef;
+    private WeakReference<Menu> menuWeakRef;
 
     @Inject
     public MainView(MainActivity activity) {
         super(activity);
-        this.activity = activity;
+        this.activityWeakRef = new WeakReference<>(activity);
         inflate(getContext(), R.layout.activity_main, this);
     }
 
     @Override
     public void init() {
-        activity.setSupportActionBar(toolbar);
+        activityWeakRef.get().setSupportActionBar(toolbar);
     }
 
     @Override
     public void clear() {
-        menu = null;
-        activity = null;
+        menuWeakRef.clear();
+        menuWeakRef = null;
+
+        activityWeakRef.clear();
+        activityWeakRef = null;
     }
 
     @Override
     public boolean inflateMenu(Menu menu) {
-        this.menu = menu;
-        activity.getMenuInflater().inflate(R.menu.activity_main_menu, menu);
+        this.menuWeakRef = new WeakReference<>(menu);
+        activityWeakRef.get().getMenuInflater().inflate(R.menu.activity_main_menu, menu);
         return true;
     }
 
@@ -60,13 +62,13 @@ public class MainView extends FrameLayout implements MainContract.View {
             case R.id.menu_action:
                 return true;
             case R.id.signin_action:
-                Util.toast(activity, "Sign in");
+                Util.toast(activityWeakRef.get(), "Sign in");
                 return true;
             case R.id.signup_action:
-                Util.toast(activity, "Sign up");
+                Util.toast(activityWeakRef.get(), "Sign up");
                 return true;
             default:
-                return activity.getParent().onOptionsItemSelected(item);
+                return activityWeakRef.get().getParent().onOptionsItemSelected(item);
         }
     }
 

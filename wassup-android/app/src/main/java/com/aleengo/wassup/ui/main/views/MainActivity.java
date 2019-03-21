@@ -15,6 +15,8 @@ import com.aleengo.wassup.ui.main.dagger.MainActivityModule;
 import com.aleengo.wassup.ui.main.presentation.MainPresenter;
 import com.aleengo.wassup.ui.main.presentation.MainView;
 
+import java.lang.ref.WeakReference;
+
 import javax.inject.Inject;
 
 public class MainActivity extends BaseActivity {
@@ -26,6 +28,7 @@ public class MainActivity extends BaseActivity {
 
     @Getter
     private MainActivityComponent daggerComponent;
+    private static WeakReference<MainActivity> mainActivityWeakRef;
 
     @Override
     public String logTag() {
@@ -39,12 +42,15 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void daggerConfiguration() {
-        daggerComponent = WassupApplication.getApplication(MainActivity.this)
+
+        mainActivityWeakRef = new WeakReference<>(this);
+
+        daggerComponent = WassupApplication.getApplication(mainActivityWeakRef.get())
                 .appComponent()
                 .MainActivityComponentBuilder()
-                .mainActivityModule(new MainActivityModule(this))
+                .mainActivityModule(new MainActivityModule(mainActivityWeakRef.get()))
                 .build();
-        daggerComponent.inject(this);
+        daggerComponent.inject(mainActivityWeakRef.get());
     }
 
     @Override
@@ -60,9 +66,12 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         presenter.clear();
         mMvpView.clear();
         daggerComponent = null;
+        mainActivityWeakRef.clear();
+        mainActivityWeakRef = null;
     }
 
     @Override
