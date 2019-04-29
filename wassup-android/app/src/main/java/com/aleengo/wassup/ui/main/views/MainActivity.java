@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public View getLayoutView() {
-        return mMvpView;
+        return mMvpView.view();
     }
 
     @Override

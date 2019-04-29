@@ -1,7 +1,9 @@
 package com.aleengo.wassup.ui.main.presentation;
 
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.aleengo.peach.toolbox.utils.Util;
@@ -19,7 +21,7 @@ import butterknife.BindView;
  * Created by CK_ALEENGO on 14/03/2019.
  * Copyright (c) 2019. All rights reserved.
  */
-public class MainView extends FrameLayout implements MainContract.View {
+public class MainView implements MainContract.View {
 
     @BindView(R.id.home_toolbar)
     Toolbar toolbar;
@@ -27,11 +29,18 @@ public class MainView extends FrameLayout implements MainContract.View {
     private WeakReference<MainActivity> activityWeakRef;
     private WeakReference<Menu> menuWeakRef;
 
+    private View mView;
+
     @Inject
     public MainView(MainActivity activity) {
-        super(activity);
         this.activityWeakRef = new WeakReference<>(activity);
-        inflate(getContext(), R.layout.activity_main, this);
+        final FrameLayout parentLayout = new FrameLayout(activityWeakRef.get());
+        mView = LayoutInflater.from(activityWeakRef.get()).
+                inflate(R.layout.activity_main, parentLayout);
+    }
+
+    public View view() {
+        return mView;
     }
 
     @Override
